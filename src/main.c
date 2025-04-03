@@ -6,6 +6,13 @@
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define D_SPEED 0.5
+#ifndef M_SPEED
+#define M_SPEED 2
+#endif
+#ifndef A_SPEED
+#define A_SPEED 0.3
+#endif
 
 int main() {
 	srand(time(NULL));
@@ -19,14 +26,16 @@ int main() {
 	int batY2 = 0;
 	int ballX = 0;
 	float fBallY = 0;
+	float fBatY2 = 0;
 	int ballY = 0;
 	int input;
 	int dir = -1; 
-	float dirY = 1;
+	float dirY = D_SPEED;
 	int score1 = 0;
 	int score2 = 0;
 	getmaxyx(stdscr, y, x);
 	while(1) {
+	clear();
 	// ball
 	for(int i = 0; i < 6; i++) {	
 	mvprintw(y/2-1+i+ballY, x/2+ballX, "%c%c%c%c%c", ball[0+i*5], ball[1+i*5], ball[2+i*5], ball[3+i*5], ball[4+i*5]);
@@ -50,8 +59,18 @@ int main() {
 	ballX += dir;
 	fBallY += dirY;
 	ballY = fBallY;
-
+	#ifdef SMART_AI
+	if(batY2 > ballY+3) {
+		fBatY2-=A_SPEED;
+	}	
+	if(batY2 < ballY-3) {
+		fBatY2+=A_SPEED;
+	}
+	batY2 = fBatY2;
+	#endif
+	#ifndef SMART_AI
 	batY2 = ballY* 0.5;
+	#endif
 
 	if(y/2+ballY < batY2) {
 		batY2++;
@@ -66,6 +85,8 @@ int main() {
 	} else if(ballX < -80) {
 		ballX = 0;
 		score2++;
+		dirY = D_SPEED;
+		dir = -1;
 		clear();
 	}
 	if (ballX > 76 && ( mvinch(y/2 + ballY, x/2+1 + 80) ==(int)'|' ||  mvinch(y/2 + ballY+3, x/2+1 + 80) == (int)'|')) {
@@ -74,13 +95,15 @@ int main() {
 	} else if (ballX > 80) {
 		ballX = 0;
 		score1++;
+		dir = -1;
+		dirY = D_SPEED;
 		clear();
 	}
 	if (input == (int)'s') {
-		batY1 += 1;
+		batY1 += M_SPEED;
 	}
 	if (input == (int)'w') {
-		batY1 -= 1;
+		batY1 -= M_SPEED;
 	}
 	if (y/2 + ballY > y-3) {
 		dirY *= -1;
