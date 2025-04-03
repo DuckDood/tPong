@@ -6,12 +6,25 @@
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+#ifndef D_SPEED
 #define D_SPEED 0.5
+#endif
+
 #ifndef M_SPEED
 #define M_SPEED 2
 #endif
+
 #ifndef A_SPEED
 #define A_SPEED 0.3
+#endif
+
+#ifndef A_LENIENCY
+#define A_LENIENCY 3
+#endif
+
+#ifndef TICK_LEN
+#define TICK_LEN 20
 #endif
 
 int main() {
@@ -33,6 +46,8 @@ int main() {
 	float dirY = D_SPEED;
 	int score1 = 0;
 	int score2 = 0;
+	int tDown1 = 0;
+	int tDown2 = 0;
 	getmaxyx(stdscr, y, x);
 	while(1) {
 	clear();
@@ -60,11 +75,11 @@ int main() {
 	fBallY += dirY;
 	ballY = fBallY;
 	#ifdef SMART_AI
-	if(batY2 > ballY+3) {
-		fBatY2-=A_SPEED;
+	if(batY2 > ballY-A_LENIENCY) {
+			fBatY2-=A_SPEED;
 	}	
-	if(batY2 < ballY-3) {
-		fBatY2+=A_SPEED;
+	if(batY2 < ballY+A_LENIENCY) {
+			fBatY2+=A_SPEED;
 	}
 	batY2 = fBatY2;
 	#endif
@@ -111,8 +126,8 @@ int main() {
 	if (y/2 + ballY < 0) {
 		dirY *= -1;
 	}
-	ballX = MAX(ballX, -x/2);
-	usleep(20000);
+	//ballX = MAX(ballX, -x/2);
+	usleep(TICK_LEN*1000);
 	}
 	endwin();
 }
